@@ -1,15 +1,27 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import HeartGlow from './components/HeartGlow'
 
 function App() {
+  const navigate = useNavigate()
+
+  const handleOpen = () => {
+    // small visual delay to let the click feel intentional
+    setTimeout(() => navigate('/surat'), 120)
+  }
+
   return (
     <div className="min-h-screen relative overflow-hidden bg-[#06000a] flex items-center justify-center">
       {/* subtle star background */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,105,180,0.12),transparent_30%),_radial-gradient(circle_at_80%_0%,rgba(255,182,193,0.12),transparent_35%),_radial-gradient(circle_at_50%_100%,rgba(199,21,133,0.12),transparent_35%)]" />
 
       <div className="relative z-10 flex flex-col items-center">
-        <HeartGlow size={220} color="#ff4da6" />
+        <button
+          onClick={handleOpen}
+          className="focus:outline-none focus:ring-2 focus:ring-pink-400/60 rounded-full"
+        >
+          <HeartGlow size={230} color="#ff4da6" />
+        </button>
 
         <Link
           to="/surat"

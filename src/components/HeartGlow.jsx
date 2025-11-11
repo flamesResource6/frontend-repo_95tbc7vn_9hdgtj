@@ -1,91 +1,102 @@
 import React from 'react'
 
-function HeartGlow({ size = 200, color = '#ff4da6' }) {
-  const heartStyle = {
-    width: size,
-    height: size,
-    filter: 'drop-shadow(0 0 25px rgba(255, 105, 180, 0.75)) drop-shadow(0 0 60px rgba(255, 105, 180, 0.45))',
-  }
+function HeartGlow({ size = 220, color = '#ff4da6', className = '', onClick }) {
+  const glowColorStrong = 'rgba(255, 20, 147, 0.55)'
+  const glowColorSoft = 'rgba(255, 105, 180, 0.35)'
 
   return (
-    <div className="relative" style={{ width: size, height: size }} aria-hidden="true">
-      {/* Outer glow */}
+    <div
+      className={`relative select-none ${className}`}
+      style={{ width: size, height: size }}
+      onClick={onClick}
+      role={onClick ? 'button' : undefined}
+      aria-label={onClick ? 'Buka surat' : undefined}
+    >
+      {/* Outer ambient glow */}
       <div
-        className="absolute inset-0 rounded-full blur-3xl opacity-50 animate-pulse"
+        className="absolute inset-0 rounded-full blur-3xl opacity-60 animate-pulse"
         style={{
-          background: `radial-gradient(circle at 50% 50%, ${color}55, transparent 60%)`,
+          background: `radial-gradient(circle at 50% 50%, ${glowColorStrong}, transparent 60%)`,
         }}
       />
 
-      {/* Heart shape using two circles and a square rotated */}
-      <div className="relative mx-auto" style={heartStyle}>
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-          <div
-            className="relative"
-            style={{ width: size, height: size }}
-          >
-            {/* left lobe */}
-            <div
-              className="absolute rounded-full"
-              style={{
-                width: size * 0.6,
-                height: size * 0.6,
-                background: color,
-                left: 0,
-                top: size * 0.1,
-              }}
-            />
-            {/* right lobe */}
-            <div
-              className="absolute rounded-full"
-              style={{
-                width: size * 0.6,
-                height: size * 0.6,
-                background: color,
-                right: 0,
-                top: size * 0.1,
-              }}
-            />
-            {/* bottom point */}
-            <div
-              className="absolute rotate-45"
-              style={{
-                width: size * 0.85,
-                height: size * 0.85,
-                background: color,
-                left: size * 0.075,
-                top: size * 0.25,
-                borderBottomRightRadius: size * 0.25,
-              }}
-            />
-          </div>
-        </div>
+      {/* Precise heart using SVG path for perfect shape */}
+      <svg
+        viewBox="0 0 100 100"
+        className="relative z-10 w-full h-full drop-shadow-[0_0_30px_rgba(255,20,147,0.55)]"
+      >
+        <defs>
+          <linearGradient id="heartGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#ff7abf" />
+            <stop offset="60%" stopColor={color} />
+            <stop offset="100%" stopColor="#ff2f9a" />
+          </linearGradient>
+          <filter id="softGlow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="2" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        </defs>
 
-        {/* Inner shine */}
-        <div
-          className="pointer-events-none absolute left-0 top-0 w-full h-full"
+        {/* subtle inner bloom */}
+        <ellipse
+          cx="50"
+          cy="42"
+          rx="22"
+          ry="14"
+          fill="rgba(255,255,255,0.22)"
+          filter="url(#softGlow)"
+        />
+
+        {/* perfect heart path */}
+        <path
+          d="M50 86s-3.7-3-7.5-5.8C28 71.5 10 59.9 10 40.5 10 26.8 21 16 34.2 16 42.3 16 48 20 50 24c2-4 7.7-8 15.8-8C79 16 90 26.8 90 40.5c0 19.4-18 31-32.5 39.7C53.7 83 50 86 50 86z"
+          fill="url(#heartGrad)"
           style={{
-            background:
-              'radial-gradient(120px 120px at 35% 30%, rgba(255,255,255,0.55), rgba(255,255,255,0) 60%)',
-            mixBlendMode: 'screen',
+            filter: `drop-shadow(0 0 18px ${glowColorStrong}) drop-shadow(0 0 42px ${glowColorSoft})`,
           }}
         />
-      </div>
 
-      {/* twinkle particles */}
-      <div className="absolute inset-0">
-        {[...Array(18)].map((_, i) => (
+        {/* shine highlight */}
+        <path
+          d="M30 35c3-6 10-10 18-8"
+          fill="none"
+          stroke="white"
+          strokeOpacity="0.35"
+          strokeWidth="3"
+          strokeLinecap="round"
+        />
+      </svg>
+
+      {/* twinkling particles */}
+      <div className="pointer-events-none absolute inset-0">
+        {[...Array(16)].map((_, i) => (
           <span
             key={i}
-            className="absolute w-1 h-1 bg-pink-300 rounded-full opacity-70 animate-ping"
+            className="absolute rounded-full bg-pink-300/80"
             style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDuration: `${2 + Math.random() * 3}s`,
+              width: 3,
+              height: 3,
+              left: `${(i * 57) % 100}%`,
+              top: `${(i * 37) % 100}%`,
+              boxShadow: `0 0 10px ${glowColorStrong}`,
+              animation: `twinkle ${2 + (i % 5)}s ease-in-out ${(i % 7) * 0.2}s infinite`,
             }}
           />
         ))}
       </div>
+
+      {/* local styles for tiny twinkle */}
+      <style>
+        {`
+          @keyframes twinkle {
+            0%, 100% { transform: scale(0.9); opacity: .6 }
+            50% { transform: scale(1.3); opacity: 1 }
+          }
+        `}
+      </style>
     </div>
   )
 }
